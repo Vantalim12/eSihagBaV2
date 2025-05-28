@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eSihagBa - City Budget Tracking System</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Animate.css for smooth animations -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #1a237e;
+        --secondary-color: #283593;
+        --accent-color: #5c6bc0;
+        --light-accent: #c5cae9;
+        --success-color: #43a047;
+        --warning-color: #ff9800;
+        --danger-color: #e53935;
+        --text-light: rgba(255, 255, 255, 0.9);
+        --text-muted: rgba(255, 255, 255, 0.6);
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition-speed: 0.3s;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .sidebar {
+        height: 100vh;
+        position: sticky;
+        top: 0;
+      }
+
+      .bg-custom-dark {
+        background-color: var(--primary-color);
+        background-image: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+      }
+
+      .nav-link {
+        color: var(--text-muted);
+        border-radius: 6px;
+        margin: 5px 0;
+        transition: all var(--transition-speed) ease;
+        padding: 8px 15px;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--text-light);
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(5px);
+      }
+
+      .nav-link i {
+        margin-right: 10px;
+        transition: transform var(--transition-speed) ease;
+      }
+
+      .nav-link:hover i,
+      .nav-link.active i {
+        transform: scale(1.2);
+      }
+
+      .card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform var(--transition-speed) ease,
+          box-shadow var(--transition-speed) ease;
+        border: none;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 20px;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .chart-container {
+        height: 300px;
+        position: relative;
+      }
+
+      .cursor-pointer {
+        cursor: pointer;
+      }
+
+      .status-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+      }
+
+      .chart {
+        width: 100%;
+        height: 100%;
+      }
+
+      .chat-box {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        z-index: 1000;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+
+      .chat-messages {
+        height: 300px;
+        overflow-y: auto;
+      }
+
+      .message {
+        max-width: 80%;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 15px;
+      }
+
+      .message.system {
+        background-color: #f1f1f1;
+        margin-right: auto;
+      }
+
+      .message.user {
+        background-color: #d0e8ff;
+        margin-left: auto;
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: rgba(92, 107, 192, 0.1);
+        cursor: pointer;
+      }
+
+      .audit-trail {
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .audit-trail-item {
+        padding: 15px;
+        border-left: 3px solid var(--primary-color);
+        margin-bottom: 10px;
+        border-radius: 5px;
+        transition: all var(--transition-speed) ease;
+      }
+
+      .audit-trail-item:hover {
+        transform: translateX(5px);
+        box-shadow: var(--card-shadow);
+      }
+
+      .audit-trail-item .timestamp {
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+
+      .audit-trail-item .user {
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .audit-trail-item .action {
+        margin-top: 5px;
+      }
+
+      .audit-trail-item .details {
+        background-color: rgba(0, 0, 0, 0.03);
+        padding: 8px;
+        border-radius: 5px;
+        margin-top: 8px;
+        font-size: 0.9rem;
+      }
+
+      .audit-trail-item.success {
+        border-left-color: var(--success-color);
+      }
+
+      .audit-trail-item.warning {
+        border-left-color: var(--warning-color);
+      }
+
+      .audit-trail-item.danger {
+        border-left-color: var(--danger-color);
+      }
+
+      /* Improved transaction table */
+      .transaction-table th {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        z-index: 1;
+      }
+
+      .transaction-card {
+        border-top: 5px solid var(--primary-color);
+      }
+
+      .verification-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-left: 5px;
+      }
+
+      .verification-badge.verified {
+        background-color: rgba(46, 125, 50, 0.15);
+        color: #2e7d32;
+      }
+
+      .verification-badge.pending {
+        background-color: rgba(255, 152, 0, 0.15);
+        color: #f57c00;
+      }
+
+      /* Animations */
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Improved date picker and search */
+      .search-input {
+        border-radius: 20px;
+        padding-left: 40px;
+        background-color: rgba(255, 255, 255, 0.9);
+        transition: all var(--transition-speed) ease;
+      }
+
+      .search-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(26, 35, 126, 0.25);
+        background-color: white;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+      }
+
+      /* Filter tags */
+      .filter-tag {
+        display: inline-block;
+        background-color: var(--light-accent);
+        color: var(--primary-color);
+        padding: 5px 12px;
+        border-radius: 20px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-speed) ease;
+      }
+
+      .filter-tag:hover {
+        background-color: var(--accent-color);
+        color: white;
+      }
+
+      .filter-tag.active {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      /* Responsive improvements */
+      @media (max-width: 768px) {
+        .nav {
+          flex-direction: row;
+          overflow-x: auto;
+          white-space: nowrap;
+          justify-content: flex-start;
+          padding: 10px 0;
+        }
+
+        .nav-link {
+          margin: 0 5px;
+        }
+
+        .chat-box {
+          width: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <!-- Header with Navigation -->
+      <div class="row bg-custom-dark text-white shadow-sm">
+        <div
+          class="col-12 d-flex align-items-center justify-content-between px-3 py-3"
+        >
+          <div class="d-flex align-items-center">
+            <i class="bi bi-buildings-fill me-2 fs-3"></i>
+            <div>
+              <h3 class="mb-0">eSihagBa</h3>
+              <p class="mb-0 text-white-50">City Budget Tracking System</p>
+            </div>
+          </div>
+          <ul class="nav d-flex align-items-center">
+            <li class="nav-item">
+              <a class="nav-link active" href="#dashboard">
+                <i class="bi bi-house-door"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#budget">
+                <i class="bi bi-pie-chart"></i> Budget Analytics
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#transactions">
+                <i class="bi bi-file-text"></i> Transactions
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#audit-trail">
+                <i class="bi bi-journal-check"></i> Audit Trail
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#events">
+                <i class="bi bi-calendar-event"></i> Event Management
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#citizens">
+                <i class="bi bi-people"></i> Citizen Portal
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="#logout">
+                <i class="bi bi-box-arrow-right"></i> Log Out
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-12 px-md-4">
+          <!-- Top Navigation -->
+          <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+          >
+            <h1 class="h2 d-flex align-items-center">
+              <i class="bi bi-speedometer2 me-2 text-primary"></i> Dashboard
+            </h1>
+            <div class="d-flex align-items-center">
+              <div class="position-relative me-3" style="flex-grow: 1">
+                <i class="bi bi-search search-icon"></i>
+                <input
+                  type="text"
+                  class="form-control search-input"
+                  placeholder="Search transactions, events..."
+                />
+              </div>
+              <div class="btn-group me-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary position-relative"
+                >
+                  <i class="bi bi-bell"></i>
+                  <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  >
+                    3
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  id="chatButton"
+                >
+                  <i class="bi bi-chat"></i>
+                </button>
+              </div>
+              <div class="d-flex align-items-center">
+                <div
+                  class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                  style="width: 40px; height: 40px"
+                >
+                  <span>BB</span>
+                </div>
+                <span>Barangay Admin</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Dashboard Content -->
+          <div id="dashboardContent" class="fade-in">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <p class="text-muted d-flex align-items-center">
+                <i class="bi bi-clock-history me-1"></i> Last updated: March 7,
+                2025 14:30
+              </p>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-download me-1"></i> Export Report
+                </button>
+                <button class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter tags -->
+            <div class="mb-4">
+              <div class="filter-tag active">All Categories</div>
+              <div class="filter-tag">Infrastructure</div>
+              <div class="filter-tag">Social Services</div>
+              <div class="filter-tag">Education</div>
+              <div class="filter-tag">Health</div>
+              <div class="filter-tag">Administration</div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="row mb-4">
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start"
+                    >
+                      <div>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                          Total Budget (2025)
+                        </h6>
+                        <h3 class="card-title">₱2,500,000</h3>
+                        <p
+                          class="card-text text-success d-flex align-items-center"
+                        >
+                          <i class="bi bi-arrow-up-right me-1"></i> +5% from
+                          last year
+                        </p>
+                      </div>
+                      <div class="bg-light p-2 rounded">
+                        <i class="bi bi-cash-stack text-primary fs-3"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start"
+                    >
+                      <div>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                          Utilized Budget
+                        </h6>
+                        <h3 class="card-title">₱1,140,000</h3>
+                        <p
+                          class="card-text text-muted d-flex align-items-center"
+                        >
+                          <i class="bi bi-pie-chart-fill me-1"></i> 45.6% of
+                          total budget
+                        </p>
+                      </div>
+                      <div class="bg-light p-2 rounded">
+                        <i class="bi bi-wallet2 text-success fs-3"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start"
+                    >
+                      <div>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                          Ongoing Projects
+                        </h6>
+                        <h3 class="card-title">7</h3>
+                        <p
+                          class="card-text text-primary d-flex align-items-center"
+                        >
+                          <i class="bi bi-calendar-plus me-1"></i> 2 starting
+                          this month
+                        </p>
+                      </div>
+                      <div class="bg-light p-2 rounded">
+                        <i class="bi bi-buildings text-warning fs-3"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start"
+                    >
+                      <div>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                          Approved Transactions
+                        </h6>
+                        <h3 class="card-title">42</h3>
+                        <p
+                          class="card-text text-warning d-flex align-items-center"
+                        >
+                          <i class="bi bi-clock me-1"></i> 5 pending approval
+                        </p>
+                      </div>
+                      <div class="bg-light p-2 rounded">
+                        <i class="bi bi-check2-circle text-info fs-3"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-center mb-3"
+                    >
+                      <h5 class="card-title d-flex align-items-center">
+                        <i class="bi bi-bar-chart-fill me-2 text-primary"></i>
+                        Budget Utilization (2025)
+                      </h5>
+                      <div class="dropdown">
+                        <button
+                          class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                          type="button"
+                          id="dropdownMenuButton"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          This Year
+                        </button>
+                        <ul
+                          class="dropdown-menu"
+                          aria-labelledby="dropdownMenuButton"
+                        >
+                          <li>
+                            <a class="dropdown-item" href="#">This Quarter</a>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="#">This Year</a>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="#">Last Year</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="chart-container">
+                      <img
+                        src="/api/placeholder/600/300"
+                        alt="Budget Utilization Chart"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-center mb-3"
+                    >
+                      <h5 class="card-title d-flex align-items-center">
+                        <i class="bi bi-pie-chart-fill me-2 text-primary"></i>
+                        Budget Allocation by Category
+                      </h5>
+                      <div class="btn-group" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          Q1
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary active"
+                        >
+                          Q2
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          Q3
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          Q4
+                        </button>
+                      </div>
+                    </div>
+                    <div class="chart-container">
+                      <img
+                        src="/api/placeholder/600/300"
+                        alt="Budget Allocation Chart"
+                        class="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card mb-4">
+              <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0 d-flex align-items-center">
+                    <i class="bi bi-activity me-2 text-primary"></i> Recent
+                    Activity
+                  </h5>
+                  <button class="btn btn-sm btn-link text-decoration-none">
+                    View All <i class="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item px-0 py-3 border-bottom">
+                    <div class="d-flex">
+                      <div
+                        class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 40px; height: 40px; min-width: 40px"
+                      >
+                        <i class="bi bi-check-lg"></i>
+                      </div>
+                      <div>
+                        <p class="mb-0 fw-medium">
+                          Budget for Health Seminar approved
+                        </p>
+                        <small class="text-muted">Today, 10:23 AM</small>
+                        <div class="mt-1 small">
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Blockchain
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item px-0 py-3 border-bottom">
+                    <div class="d-flex">
+                      <div
+                        class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 40px; height: 40px; min-width: 40px"
+                      >
+                        <i class="bi bi-cart-plus"></i>
+                      </div>
+                      <div>
+                        <p class="mb-0 fw-medium">
+                          New transaction: Purchase of office supplies
+                        </p>
+                        <small class="text-muted">Yesterday, 3:45 PM</small>
+                        <div class="mt-1 small">
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Blockchain
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item px-0 py-3 border-bottom">
+                    <div class="d-flex">
+                      <div
+                        class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 40px; height: 40px; min-width: 40px"
+                      >
+                        <i class="bi bi-file-earmark-text"></i>
+                      </div>
+                      <div>
+                        <p class="mb-0 fw-medium">
+                          Quarterly budget report published
+                        </p>
+                        <small class="text-muted">March 5, 2025, 9:00 AM</small>
+                        <div class="mt-1 small">
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Blockchain
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="list-group-item px-0 py-3">
+                    <div class="d-flex">
+                      <div
+                        class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 40px; height: 40px; min-width: 40px"
+                      >
+                        <i class="bi bi-check2-circle"></i>
+                      </div>
+                      <div>
+                        <p class="mb-0 fw-medium">
+                          Community Clean-up event marked as completed
+                        </p>
+                        <small class="text-muted">March 3, 2025, 5:30 PM</small>
+                        <div class="mt-1 small">
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Blockchain
+                            Verified
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="card mb-4">
+              <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0 d-flex align-items-center">
+                    <i class="bi bi-calendar-event me-2 text-primary"></i>
+                    Upcoming Events
+                  </h5>
+                  <button class="btn btn-sm btn-outline-primary">
+                    View All
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">Health Seminar</div>
+                          <small class="text-muted">Community Center</small>
+                        </td>
+                        <td>March 22, 2025</td>
+                        <td>₱15,000</td>
+                        <td><span class="badge bg-primary">Ongoing</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-primary">
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">Scholarship Program</div>
+                          <small class="text-muted">Barangay Hall</small>
+                        </td>
+                        <td>April 1, 2025</td>
+                        <td>₱100,000</td>
+                        <td><span class="badge bg-warning">Planned</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-primary">
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">Road Repair Project</div>
+                          <small class="text-muted">Main Street</small>
+                        </td>
+                        <td>April 10, 2025</td>
+                        <td>₱150,000</td>
+                        <td><span class="badge bg-info">Approved</span></td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-primary">
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction Section (Hidden by default) -->
+          <div id="transactionContent" style="display: none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="d-flex align-items-center">
+                <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+                Transaction History
+              </h2>
+              <button class="btn btn-success">
+                <i class="bi bi-plus-lg me-1"></i> Add New Transaction
+              </button>
+            </div>
+
+            <div class="card transaction-card mb-4">
+              <div
+                class="card-header bg-white d-flex justify-content-between align-items-center"
+              >
+                <h5 class="mb-0 d-flex align-items-center">
+                  <i class="bi bi-list-check me-2 text-primary"></i> AUDIT TRAIL
+                </h5>
+                <div class="d-flex gap-2">
+                  <select class="form-select form-select-sm">
+                    <option>All Categories</option>
+                    <option>Infrastructure</option>
+                    <option>Social Services</option>
+                    <option>Administrative</option>
+                    <option>Health Programs</option>
+                    <option>Education</option>
+                  </select>
+                  <select class="form-select form-select-sm">
+                    <option>Last 30 days</option>
+                    <option>Last 90 days</option>
+                    <option>This year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover transaction-table">
+                    <thead>
+                      <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Receipt</th>
+                        <th>Blockchain Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">
+                            Purchase of office supplies
+                          </div>
+                          <small class="text-muted">Administrative</small>
+                        </td>
+                        <td>₱5,000</td>
+                        <td>2025-03-04</td>
+                        <td>OR-2025-001</td>
+                        <td>
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Verified
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-eye"></i> View
+                          </button>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">
+                            Payment for community center repairs
+                          </div>
+                          <small class="text-muted">Infrastructure</small>
+                        </td>
+                        <td>₱35,000</td>
+                        <td>2025-03-02</td>
+                        <td>OR-2025-002</td>
+                        <td>
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Verified
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-eye"></i> View
+                          </button>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">
+                            Catering for barangay assembly
+                          </div>
+                          <small class="text-muted">Administrative</small>
+                        </td>
+                        <td>₱12,000</td>
+                        <td>2025-02-28</td>
+                        <td>OR-2025-003</td>
+                        <td>
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Verified
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-eye"></i> View
+                          </button>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">
+                            Medical supplies for health center
+                          </div>
+                          <small class="text-muted">Health</small>
+                        </td>
+                        <td>₱28,000</td>
+                        <td>2025-02-25</td>
+                        <td>OR-2025-004</td>
+                        <td>
+                          <span class="verification-badge pending">
+                            <i class="bi bi-shield me-1"></i> Pending
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-eye"></i> View
+                          </button>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="fw-medium">Streetlight installation</div>
+                          <small class="text-muted">Infrastructure</small>
+                        </td>
+                        <td>₱45,000</td>
+                        <td>2025-02-20</td>
+                        <td>OR-2025-005</td>
+                        <td>
+                          <span class="verification-badge verified">
+                            <i class="bi bi-shield-check me-1"></i> Verified
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-eye"></i> View
+                          </button>
+                          <button class="btn btn-sm btn-secondary">
+                            <i class="bi bi-download"></i> Download
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-center mt-3"
+                >
+                  <p class="text-muted mb-0">Showing 5 of 42 transactions</p>
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                      <li class="page-item">
+                        <a class="page-link" href="#"
+                          ><i class="bi bi-chevron-left"></i
+                        ></a>
+                      </li>
+                      <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#"
+                          ><i class="bi bi-chevron-right"></i
+                        ></a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-body">
+                <h5 class="card-title d-flex align-items-center">
+                  <i class="bi bi-key me-2 text-primary"></i> Transaction
+                  Verification
+                </h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="text-muted">
+                      Enter Transaction ID or Receipt Number
+                    </p>
+                    <div class="input-group mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="e.g., OR-2025-001"
+                      />
+                      <button class="btn btn-primary" type="button">
+                        <i class="bi bi-search me-1"></i> Verify
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="text-muted">Blockchain Verification Status</p>
+                    <div
+                      class="alert alert-success d-flex align-items-center"
+                      role="alert"
+                    >
+                      <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                      <div>
+                        <strong>Transaction Verified</strong>
+                        <p class="mb-0 small">
+                          Last transaction (OR-2025-001) has been verified on
+                          the blockchain. Hash: 0x7f9e...
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audit Trail Section (Hidden by default) -->
+          <div id="auditTrailContent" style="display: none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="d-flex align-items-center">
+                <i class="bi bi-journal-check me-2 text-primary"></i> Audit
+                Trail
+              </h2>
+              <div class="d-flex gap-2">
+                <div class="input-group">
+                  <span class="input-group-text"
+                    ><i class="bi bi-calendar3"></i
+                  ></span>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    value="2025-03-01"
+                  />
+                  <span class="input-group-text">to</span>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    value="2025-03-07"
+                  />
+                </div>
+                <button class="btn btn-outline-primary">
+                  <i class="bi bi-filter me-1"></i> Filter
+                </button>
+                <button class="btn btn-outline-secondary">
+                  <i class="bi bi-download me-1"></i> Export
+                </button>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0 d-flex align-items-center">
+                    <i class="bi bi-activity me-2 text-primary"></i> System
+                    Activity Log
+                  </h5>
+                  <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm">
+                      <option>All Actions</option>
+                      <option>Login/Logout</option>
+                      <option>Create</option>
+                      <option>Update</option>
+                      <option>Delete</option>
+                      <option>Approve</option>
+                      <option>Reject</option>
+                    </select>
+                    <select class="form-select form-select-sm">
+                      <option>All Users</option>
+                      <option>Administrators</option>
+                      <option>Barangay Officials</option>
+                      <option>System</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="audit-trail">
+                  <!-- Success item -->
+                  <div class="audit-trail-item success">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">Barangay Captain - John Santos</div>
+                      <div class="timestamp">March 7, 2025, 14:25:36</div>
+                    </div>
+                    <div class="action">
+                      <strong>Approved</strong> budget allocation for Health
+                      Seminar
+                    </div>
+                    <div class="details">
+                      <p class="mb-1"><strong>Amount:</strong> ₱15,000</p>
+                      <p class="mb-1">
+                        <strong>Category:</strong> Health Programs
+                      </p>
+                      <p class="mb-1">
+                        <strong>Blockchain Hash:</strong>
+                        <a
+                          href="https://www.icpexplorer.org/#/tx/23f5f75b9a02a068fa2293d445ac9f66a071f7b928bc1c4cf7494e91064f10d9"
+                          target="_blank"
+                          class="text-decoration-none"
+                          >0x23f5f75b9a02a0...<i
+                            class="bi bi-box-arrow-up-right ms-1 small"
+                          ></i
+                        ></a>
+                      </p>
+                      <p class="mb-0">
+                        <strong>IP Address:</strong> 192.168.1.5
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Warning item -->
+                  <div class="audit-trail-item warning">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">Treasurer - Maria Reyes</div>
+                      <div class="timestamp">March 7, 2025, 13:42:11</div>
+                    </div>
+                    <div class="action">
+                      <strong>Modified</strong> transaction record for Office
+                      Supplies
+                    </div>
+                    <div class="details">
+                      <p class="mb-1">
+                        <strong>Previous Amount:</strong> ₱4,500
+                      </p>
+                      <p class="mb-1"><strong>New Amount:</strong> ₱5,000</p>
+                      <p class="mb-1">
+                        <strong>Reason:</strong> Additional items purchased
+                      </p>
+                      <p class="mb-1">
+                        <strong>Blockchain Status:</strong> Verified
+                      </p>
+                      <p class="mb-1">
+                        <strong>Blockchain Hash:</strong>
+                        <a
+                          href="https://www.icpexplorer.org/#/tx/ebf72ddacef8340cf0a814461742b7cf8836d30167cac08f294386212f6b89ee"
+                          target="_blank"
+                          class="text-decoration-none"
+                          >0xebf72ddacef834...<i
+                            class="bi bi-box-arrow-up-right ms-1 small"
+                          ></i
+                        ></a>
+                      </p>
+                      <p class="mb-0">
+                        <strong>IP Address:</strong> 192.168.1.10
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Regular item -->
+                  <div class="audit-trail-item">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">System</div>
+                      <div class="timestamp">March 7, 2025, 12:30:00</div>
+                    </div>
+                    <div class="action">
+                      <strong>Generated</strong> quarterly budget report
+                    </div>
+                    <div class="details">
+                      <p class="mb-1"><strong>Period:</strong> Q1 2025</p>
+                      <p class="mb-1">
+                        <strong>Total Budget:</strong> ₱625,000
+                      </p>
+                      <p class="mb-1"><strong>Utilized:</strong> ₱283,500</p>
+                      <p class="mb-0">
+                        <strong>Report Hash:</strong>
+                        <a
+                          href="https://www.icpexplorer.org/#/tx/2e065f501f0d72bb577fd1f2b4f52b31bbbe7aba6e1c442bfb6c3080fcbe7b6d"
+                          target="_blank"
+                          class="text-decoration-none"
+                          >0x2e065f501f0d72...<i
+                            class="bi bi-box-arrow-up-right ms-1 small"
+                          ></i
+                        ></a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Regular item -->
+                  <div class="audit-trail-item">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">Secretary - Ana Cruz</div>
+                      <div class="timestamp">March 7, 2025, 11:15:22</div>
+                    </div>
+                    <div class="action">
+                      <strong>Created</strong> new event: Community Clean-up
+                      Drive
+                    </div>
+                    <div class="details">
+                      <p class="mb-1"><strong>Date:</strong> March 15, 2025</p>
+                      <p class="mb-1">
+                        <strong>Budget Requested:</strong> ₱8,500
+                      </p>
+                      <p class="mb-1">
+                        <strong>Status:</strong> Pending Approval
+                      </p>
+                      <p class="mb-0">
+                        <strong>IP Address:</strong> 192.168.1.8
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Danger item -->
+                  <div class="audit-trail-item danger">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">Administrator - Robert Garcia</div>
+                      <div class="timestamp">March 7, 2025, 10:05:48</div>
+                    </div>
+                    <div class="action">
+                      <strong>Deleted</strong> transaction record
+                    </div>
+                    <div class="details">
+                      <p class="mb-1">
+                        <strong>Transaction ID:</strong> OR-2025-000
+                      </p>
+                      <p class="mb-1"><strong>Amount:</strong> ₱3,000</p>
+                      <p class="mb-1">
+                        <strong>Reason:</strong> Duplicate entry
+                      </p>
+                      <p class="mb-1">
+                        <strong>Approval:</strong> Authorized by Barangay
+                        Captain
+                      </p>
+                      <p class="mb-1">
+                        <strong>Blockchain Hash:</strong>
+                        <a
+                          href="https://www.icpexplorer.org/#/tx/d924ca2a8cee3bd95d267a4a3e1349c8a470ed74c6de0b58bc0abf957cf2f6e6"
+                          target="_blank"
+                          class="text-decoration-none"
+                          >0xd924ca2a8cee3bd...<i
+                            class="bi bi-box-arrow-up-right ms-1 small"
+                          ></i
+                        ></a>
+                      </p>
+                      <p class="mb-0">
+                        <strong>IP Address:</strong> 192.168.1.2
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Regular item -->
+                  <div class="audit-trail-item">
+                    <div class="d-flex justify-content-between">
+                      <div class="user">Barangay Captain - John Santos</div>
+                      <div class="timestamp">March 7, 2025, 09:30:15</div>
+                    </div>
+                    <div class="action">
+                      <strong>Logged in</strong> to the system
+                    </div>
+                    <div class="details">
+                      <p class="mb-1"><strong>Device:</strong> Desktop</p>
+                      <p class="mb-1">
+                        <strong>Browser:</strong> Chrome 120.0.0
+                      </p>
+                      <p class="mb-1"><strong>OS:</strong> Windows 11</p>
+                      <p class="mb-0">
+                        <strong>IP Address:</strong> 192.168.1.5
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="d-flex justify-content-between align-items-center mt-4"
+                >
+                  <p class="text-muted mb-0">Showing 6 of 237 activities</p>
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                      <li class="page-item">
+                        <a class="page-link" href="#"
+                          ><i class="bi bi-chevron-left"></i
+                        ></a>
+                      </li>
+                      <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link" href="#"
+                          ><i class="bi bi-chevron-right"></i
+                        ></a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header bg-white">
+                <h5 class="mb-0 d-flex align-items-center">
+                  <i class="bi bi-search me-2 text-primary"></i> Advanced Audit
+                  Search
+                </h5>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Search by User</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter username"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Action Type</label>
+                    <select class="form-select">
+                      <option selected>All Actions</option>
+                      <option>Login/Logout</option>
+                      <option>Create</option>
+                      <option>Update</option>
+                      <option>Delete</option>
+                      <option>Approve</option>
+                      <option>Reject</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Date Range</label>
+                    <select class="form-select">
+                      <option>Today</option>
+                      <option>Yesterday</option>
+                      <option>Last 7 days</option>
+                      <option>Last 30 days</option>
+                      <option selected>Custom Range</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">IP Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g., 192.168.1.1"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Transaction ID</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="e.g., OR-2025-001"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Blockchain Hash</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter blockchain hash"
+                    />
+                  </div>
+                  <div class="col-12 text-end">
+                    <button class="btn btn-secondary me-2">Reset</button>
+                    <button class="btn btn-primary">Search Audit Logs</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Box (Hidden by default) -->
+    <div class="chat-box shadow border rounded" style="display: none">
+      <div class="card">
+        <div
+          class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2"
+        >
+          <h6 class="mb-0 d-flex align-items-center">
+            <i class="bi bi-chat-square-text me-2"></i> Direct Concern Chat
+          </h6>
+          <button class="btn-close btn-close-white" id="closeChat"></button>
+        </div>
+        <div class="card-body chat-messages p-3">
+          <div class="message system">
+            <p class="mb-0">Welcome! How can we help you today?</p>
+            <small class="text-muted">System • 2:30 PM</small>
+          </div>
+          <div class="message user">
+            <p class="mb-0">
+              I'm looking for information about the recent road repair budget.
+            </p>
+            <small class="text-muted">You • 2:31 PM</small>
+          </div>
+          <div class="message system">
+            <p class="mb-0">
+              The Road Repair Project has an allocated budget of ₱150,000 and is
+              scheduled to begin on April 10, 2025. Would you like to know more
+              specific details?
+            </p>
+            <small class="text-muted">Support Agent • 2:32 PM</small>
+          </div>
+          <!-- User messages will appear here -->
+        </div>
+        <div class="card-footer p-2">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Type your message..."
+            />
+            <button class="btn btn-primary">
+              <i class="bi bi-send"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Simple navigation toggle
+      document.addEventListener("DOMContentLoaded", function () {
+        const navLinks = document.querySelectorAll(".nav-link");
+        const contentSections = {
+          "#dashboard": document.getElementById("dashboardContent"),
+          "#transactions": document.getElementById("transactionContent"),
+          "#audit-trail": document.getElementById("auditTrailContent"),
+        };
+
+        navLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            // Update active link
+            navLinks.forEach((l) => l.classList.remove("active"));
+            this.classList.add("active");
+
+            // Show/hide content
+            const href = this.getAttribute("href");
+            if (contentSections[href]) {
+              Object.values(contentSections).forEach((section) => {
+                if (section) {
+                  section.style.display = "none";
+                }
+              });
+              contentSections[href].style.display = "block";
+              contentSections[href].classList.add("fade-in");
+            }
+          });
+        });
+
+        // Chat toggle
+        const chatButton = document.getElementById("chatButton");
+        const chatBox = document.querySelector(".chat-box");
+        const closeChat = document.getElementById("closeChat");
+
+        chatButton.addEventListener("click", function () {
+          chatBox.style.display =
+            chatBox.style.display === "none" ? "block" : "none";
+        });
+
+        closeChat.addEventListener("click", function () {
+          chatBox.style.display = "none";
+        });
+
+        // Filter tags
+        const filterTags = document.querySelectorAll(".filter-tag");
+
+        filterTags.forEach((tag) => {
+          tag.addEventListener("click", function () {
+            filterTags.forEach((t) => t.classList.remove("active"));
+            this.classList.add("active");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
