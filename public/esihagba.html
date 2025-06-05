@@ -2291,6 +2291,65 @@
           });
         });
       });
+
+      // Wallet connection functionality
+      let isWalletConnected = false;
+      let connectedWallet = null;
+
+      function connectWallet(walletType) {
+        // Simulate wallet connection
+        isWalletConnected = true;
+        connectedWallet = walletType;
+
+        // Update UI
+        const walletConnectBtn = document.getElementById("walletConnectBtn");
+        const walletStatus = document.getElementById("walletStatus");
+
+        walletConnectBtn.innerHTML =
+          '<i class="bi bi-wallet2"></i> Disconnect Wallet';
+        walletStatus.className = "wallet-status connected";
+        walletStatus.innerHTML =
+          '<i class="bi bi-circle-fill me-1" style="font-size: 0.5rem"></i> Connected';
+
+        // Close modal
+        const walletModal = bootstrap.Modal.getInstance(
+          document.getElementById("walletModal")
+        );
+        if (walletModal) {
+          walletModal.hide();
+        }
+      }
+
+      function disconnectWallet() {
+        isWalletConnected = false;
+        connectedWallet = null;
+
+        // Update UI
+        const walletConnectBtn = document.getElementById("walletConnectBtn");
+        const walletStatus = document.getElementById("walletStatus");
+
+        walletConnectBtn.innerHTML =
+          '<i class="bi bi-wallet2"></i> Connect Wallet';
+        walletStatus.className = "wallet-status disconnected";
+        walletStatus.innerHTML =
+          '<i class="bi bi-circle-fill me-1" style="font-size: 0.5rem"></i> Not Connected';
+      }
+
+      // Initialize wallet connect button
+      document.addEventListener("DOMContentLoaded", function () {
+        const walletConnectBtn = document.getElementById("walletConnectBtn");
+        const walletModal = new bootstrap.Modal(
+          document.getElementById("walletModal")
+        );
+
+        walletConnectBtn.addEventListener("click", function () {
+          if (!isWalletConnected) {
+            walletModal.show();
+          } else {
+            disconnectWallet();
+          }
+        });
+      });
     </script>
   </body>
 </html>
