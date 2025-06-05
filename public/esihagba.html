@@ -389,6 +389,42 @@
           width: 300px;
         }
       }
+
+      .certificate-box {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 32px;
+        margin: 32px auto;
+        max-width: 800px;
+      }
+      .btn-print {
+        width: 120px;
+      }
+      .btn-close-modal {
+        width: 120px;
+      }
+      .modal-content {
+        border-radius: 16px;
+      }
+      .logo {
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+        margin-bottom: 12px;
+      }
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        .certificate-box {
+          box-shadow: none;
+          border: none;
+        }
+        body {
+          background: #fff;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1889,6 +1925,104 @@
                 </div>
               </div>
             </div>
+
+            <!-- Add button in Citizen Portal section -->
+            <div class="d-flex justify-content-end mb-3">
+              <a
+                href="barangay-clearance.html"
+                target="_blank"
+                class="btn btn-primary"
+              >
+                <i class="bi bi-file-earmark-plus"></i> Generate Barangay
+                Clearance (New Tab)
+              </a>
+              <button class="btn btn-success ms-2" id="openGenerateModal">
+                <i class="bi bi-file-earmark-plus"></i> Generate Barangay
+                Clearance (Inline)
+              </button>
+            </div>
+            <!-- Modal: Select Resident -->
+            <div
+              class="modal fade"
+              id="generateModal"
+              tabindex="-1"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Generate Barangay Clearance</h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="generateForm">
+                      <div class="mb-3">
+                        <label for="residentSelect" class="form-label"
+                          >Select Resident</label
+                        >
+                        <select
+                          class="form-select"
+                          id="residentSelect"
+                          required
+                        >
+                          <option value="">Choose...</option>
+                        </select>
+                      </div>
+                      <button type="submit" class="btn btn-success w-100">
+                        Generate
+                      </button>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-close-modal"
+                      data-bs-dismiss="modal"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Certificate Display (Inline) -->
+            <div class="certificate-box d-none" id="certificateBox">
+              <div class="text-center mb-3">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Ph_seal_iligan.png/1200px-Ph_seal_iligan.png"
+                  class="logo"
+                  alt="Barangay Logo"
+                />
+                <h6 class="mb-0">Republic of the Philippines</h6>
+                <div>Province of Lanao Del Norte</div>
+                <div>Municipality of Iligan City</div>
+                <h4 class="fw-bold text-primary mb-2">Barangay Dalipuga</h4>
+                <h5 class="fw-bold">BARANGAY CLEARANCE</h5>
+                <h6 class="fw-bold">TO WHOM IT MAY CONCERN:</h6>
+              </div>
+              <div class="mb-4" id="certificateBody">
+                <!-- Certificate content will be injected here -->
+              </div>
+              <div class="d-flex justify-content-center gap-3 no-print">
+                <button
+                  class="btn btn-success btn-print"
+                  onclick="window.print()"
+                >
+                  Print
+                </button>
+                <button
+                  class="btn btn-danger btn-close-modal"
+                  id="closeCertificate"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2349,6 +2483,94 @@
             disconnectWallet();
           }
         });
+      });
+
+      // Mock resident data
+      const residents = [
+        {
+          id: 1,
+          name: "Jasper Gumora",
+          age: 21,
+          address: "Barangay Dalipuga, Iligan City",
+        },
+        {
+          id: 2,
+          name: "Maria Santos",
+          age: 32,
+          address: "Barangay Dalipuga, Iligan City",
+        },
+        {
+          id: 3,
+          name: "Juan Dela Cruz",
+          age: 28,
+          address: "Barangay Dalipuga, Iligan City",
+        },
+      ];
+      // Populate resident select
+      document.addEventListener("DOMContentLoaded", function () {
+        const residentSelect = document.getElementById("residentSelect");
+        if (residentSelect && residentSelect.children.length === 1) {
+          residents.forEach((res) => {
+            const opt = document.createElement("option");
+            opt.value = res.id;
+            opt.textContent = `${res.name} (ID: ${res.id})`;
+            residentSelect.appendChild(opt);
+          });
+        }
+        // Modal logic
+        const openGenerateModal = document.getElementById("openGenerateModal");
+        if (openGenerateModal) {
+          const generateModal = new bootstrap.Modal(
+            document.getElementById("generateModal")
+          );
+          openGenerateModal.addEventListener("click", () => {
+            document.getElementById("generateForm").reset();
+            generateModal.show();
+          });
+        }
+        // Generate certificate
+        const generateForm = document.getElementById("generateForm");
+        if (generateForm) {
+          generateForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const residentId = parseInt(residentSelect.value);
+            const resident = residents.find((r) => r.id === residentId);
+            if (!resident) return;
+            // Fill certificate
+            const today = new Date();
+            const dateStr = `${
+              today.getMonth() + 1
+            }/${today.getDate()}/${today.getFullYear()}`;
+            document.getElementById("certificateBody").innerHTML = `
+              <p>This is to certify that <b>${resident.name}</b>, ${resident.age} years old, and a resident of ${resident.address}, is known to be of good moral character and a law-abiding citizen of the community.</p>
+              <p>To certify further, that he/she has no derogatory and/or criminal records filed in this barangay.</p>
+              <p><b>ISSUED this ${dateStr} at Barangay Dalipuga, Iligan City, upon request of the interested party for whatever legal purpose it may serve.</b></p>
+              <div class='mt-4 mb-2 text-end'>
+                <b>NILDA C. HAMOY</b><br><span style='font-size: 0.95em;'>Barangay Captain</span>
+              </div>
+              <div class='row mt-4'>
+                <div class='col-6'>
+                  <div>O.R. No: ____________</div>
+                  <div>Date Issued: ${dateStr}</div>
+                  <div>Doc. Stamp: Paid</div>
+                </div>
+              </div>
+            `;
+            document
+              .getElementById("certificateBox")
+              .classList.remove("d-none");
+            bootstrap.Modal.getInstance(
+              document.getElementById("generateModal")
+            ).hide();
+          });
+        }
+        // Close certificate
+        const closeCertificate = document.getElementById("closeCertificate");
+        if (closeCertificate) {
+          closeCertificate.addEventListener("click", function () {
+            document.getElementById("certificateBox").classList.add("d-none");
+          });
+        }
       });
     </script>
   </body>
